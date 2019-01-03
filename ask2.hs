@@ -16,15 +16,43 @@ nubtuple (x:xs) = let xn = (removeItem x xs) in (let xns = nubtuple xn in sort(x
 
 tupleinorder :: [(Int,Int)] -> [(Int,Int)]
 tupleinorder [] = []
-tupleinorder ((x1,x2):xs) =let xn=(kalaeimai xs) in( if(x1<x2)
+tupleinorder ((x1,x2):xs) =let xn=(tupleinorder xs) in( if(x1<x2)
                          then ((x1,x2):xn)
                          else ((x2,x1):xn))
+
+fixtuple::[(Int,Int)] -> [(Int,Int)]
+fixtuple a = let b= nubtuple a in (tupleinorder b)
+
+checktuple :: ([Int] ,[(Int,Int)] )-> Bool
+checktuple (a,[])=True
+checktuple (a,(b1,b2):bs) = if(b1 `elem` a)
+                            then if(b2 `elem` a)
+                                then checktuple (a,bs)
+                                else False
+                            else False
+
+listlistlength :: [[Int]] -> [Int]
+listlistlength a = map length a
+
+listlistappend ::(Int,Int) -> [[Int]] -> [[Int]]
+listlistappend (a1,a2) [] = [[a1,a2]]
+listlistappend (a1,a2) (a:as) = if(or [(a1 `elem` a),(a2 `elem` a)] )
+                                then if ( and [(a1 `elem` a) ,(not (a2 `elem` a) )] )
+                                    then ((a2:a):as)
+                                    else if ( and [(a2 `elem` a) ,(not (a1 `elem` a) )] )
+                                    then ((a1:a):as)
+                                    else (a:as)
+                                else a:(listlistappend (a1,a2) as)
 
 intToDouble :: Int -> Double
 intToDouble x =fromIntegral x/1.0
 
 doubleToInt :: Double -> Int
 doubleToInt x =floor x
+
+add1:: Int -> [Int]->[Int]
+add1 0 b=b
+add1 a b =let b1=add1 (a-1) b in (1:b1)
 
 fdiv2 :: Int -> Double
 fdiv2 x = intToDouble(x)/2
@@ -54,7 +82,7 @@ multiples = [ n | n <- [1..], multi235 n]
 
 
 fun :: Int -> Int -> Int -> Int
-fun a b c = a^b^c
+fun a b c = a*b*c
 
 sssumn :: (Int -> Int -> Int -> Int) -> Int -> Int -> Int -> Int -> Int -> Int -> Int -> Int
 sssumn f a b c a1 b1 c1 res= if (c1 < c)
@@ -68,28 +96,15 @@ sssumn f a b c a1 b1 c1 res= if (c1 < c)
 sssum :: (Int -> Int -> Int -> Int) -> Int -> Int -> Int -> Int
 sssum f a b c = sssumn f a b c 1 1 1 (f 1 1 1)
 
-checktuple :: ([Int] ,[(Int,Int)] )-> Bool
-checktuple (a,[])=True
-checktuple (a,(b1,b2):bs) = if(b1 `elem` a)
-                              then if(b2 `elem` a)
-                                   then checktuple (a,bs)
-                                   else False
-                              else False
+comp1::[(Int,Int)]  -> [[Int]]
+comp1 [(b1,b2)]  = [[b1,b2]]
+comp1 ((b1,b2):bs)  =let a=comp1 bs in (listlistappend (b1,b2) a)
 
+comp :: [Int] -> [(Int,Int)] -> (Int, [Int])
+comp a b = let bn = comp1 b  in (   (  ((length bn) + (length a) - (foldl (+) 0 (listlistlength bn) ) ) ,sort (add1 ((length a) - (foldl (+) 0 (listlistlength bn) )) (listlistlength bn) ) )  )
 
---comp :: [Int] -> [(Int,Int)] -> (Int, [Int])
---comp a ((b1,b2):bs) = Let b =
---comp a ((b1,b2):bs) =let len=length bs in (if (len==0)
---                                           then let (c,[d])=(1,[2]) in (c,[d])
---                                           else (2,[121,1])
---                                           )
-
---components :: ([Int] ,[(Int,Int)] )-> (Int,[Int])
---components ([],_)= (0,[])
---components (a,b) = let as=nubtuple b in (if ((length as)==0)
---                                        then (0,[])
---                                        else (if (checktuple (a,b))
---                                             then comp a b
---                                             else (0,[])
---                                             )
---                                        )
+components :: ([Int] ,[(Int,Int)] )-> (Int,[Int])
+components ([],[])= (0,[])
+components (a,b) = if (checktuple (a,b))
+                    then (let bs = fixtuple b in (comp a bs) )
+                    else (-1,[-1])
