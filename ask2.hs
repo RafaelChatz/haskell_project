@@ -108,3 +108,20 @@ components ([],[])= (0,[])
 components (a,b) = if (checktuple (a,b))
                     then (let bs = fixtuple b in (comp a bs) )
                     else (-1,[-1])
+
+calcfractions :: Int -> Int -> Int ->(Int,Int)
+calcfractions a b c =let d =( (a*c) - b ) in (d,b*c)
+
+findfraction :: Int -> Int -> [Int]
+findfraction 1 q= [q]
+findfraction p q= if (q `mod` p==0)
+                  then findfraction 1 (q `div` p)
+                  else let a = (ceiling ((intToDouble q)/(intToDouble p)) ) in ( let (pn,qn)=(calcfractions p q a) in a:(findfraction pn qn) )
+
+
+fractions :: Int -> Int -> [Int]
+fractions p q = if (p==1)
+                then [q]
+                else if (q `mod` p==0)
+                    then [(q `div` p)]
+                else findfraction p q
