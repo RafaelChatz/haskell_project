@@ -63,6 +63,8 @@ fdiv3 x = intToDouble(x)/3
 logx :: Double -> Double -> Double
 logx x y= log x / log y
 
+------------------------------------------------------------------------
+-----multiples
 ispowerx :: Double -> Double -> Bool
 ispowerx x y = ceiling (logx x y )==floor(logx x y)
 
@@ -79,11 +81,12 @@ multi235 n
     | otherwise = False
 
 multiples = [ n | n <- [1..], multi235 n]
-
-
+------------------------------------------------------------------------
+------ function for sssum
 fun :: Int -> Int -> Int -> Int
 fun a b c = a*b*c
-
+------------------------------------------------------------------------
+-----sssum
 sssumn :: (Int -> Int -> Int -> Int) -> Int -> Int -> Int -> Int -> Int -> Int -> Int -> Int
 sssumn f a b c a1 b1 c1 res= if (c1 < c)
                             then sssumn f a b c a1 b1 (c1+1) res +(f a1 b1 (c1+1))
@@ -95,7 +98,8 @@ sssumn f a b c a1 b1 c1 res= if (c1 < c)
 
 sssum :: (Int -> Int -> Int -> Int) -> Int -> Int -> Int -> Int
 sssum f a b c = sssumn f a b c 1 1 1 (f 1 1 1)
-
+------------------------------------------------------------------------
+-----components
 comp1::[(Int,Int)]  -> [[Int]]
 comp1 [(b1,b2)]  = [[b1,b2]]
 comp1 ((b1,b2):bs)  =let a=comp1 bs in (listlistappend (b1,b2) a)
@@ -109,6 +113,8 @@ components (a,b) = if (checktuple (a,b))
                     then (let bs = fixtuple b in (comp a bs) )
                     else (-1,[-1])
 
+------------------------------------------------------------------------
+----fractions
 calcfractions :: Int -> Int -> Int ->(Int,Int)
 calcfractions a b c =let d =( (a*c) - b ) in (d,b*c)
 
@@ -125,3 +131,27 @@ fractions p q = if (p==1)
                 else if (q `mod` p==0)
                     then [(q `div` p)]
                 else findfraction p q
+
+------------------------------------------------------------------------
+-----ugliness
+ugliness2 :: [Int]->[Int]->Int
+ugliness2 [a] [b] = abs(a-b)
+ugliness2 (a:as) (b:bs) =let n = ugliness2 as bs in ( if(n>abs(a-b))
+                                                      then n
+                                                      else abs(a-b) )
+
+ugliness1 :: [Int]->[Int]->Int
+--ugliness1 a (b:bs) =let b1= take(length (a)) (b:bs) ) in b1
+ugliness1 a (b:bs) =if((length a)==(length (b:bs)))
+                    then ugliness2 a (b:bs)
+                    else let b1= take(length (a)) (b:bs)  in (let n=ugliness1 a bs in (let n1= ugliness2 a b1 in ( if (n>n1)
+                                                                                                                    then n1
+                                                                                                                    else n) ) )
+
+ugliness :: [Int]->[Int]->Int
+ugliness a b =let (a1,b1)=(sort a,sort b ) in if ((length a1)<(length b1))
+                                              then ugliness1 a1 b1
+                                              else if ((length a1)>(length b1))
+                                              then ugliness1 b1 a1
+                                              else ugliness2 a1 b1
+------------------------------------------------------------------------
